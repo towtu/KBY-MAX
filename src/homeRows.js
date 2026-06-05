@@ -68,12 +68,11 @@ export const BROWSE_ROW_CONFIGS = [
   {
     id: 'tv-shows',
     title: 'TV Shows',
-    note: 'Series, K-dramas, and anime',
+    note: 'Series and K-dramas',
     source: 'tvHub',
     quickLinks: [
       { id: 'trending-shows', label: 'Trending' },
       { id: 'k-dramas', label: 'K-Dramas' },
-      { id: 'anime-spotlight', label: 'Anime' },
       { id: 'tv-drama', label: 'Drama' },
       { id: 'tv-comedy', label: 'Comedy' }
     ]
@@ -89,12 +88,6 @@ export const BROWSE_ROW_CONFIGS = [
     title: 'Trending Shows',
     note: 'Series people are watching',
     source: 'trendingShows'
-  },
-  {
-    id: 'anime-spotlight',
-    title: 'Anime Spotlight',
-    note: 'Trending anime from AniList',
-    source: 'animeTrending'
   },
   {
     id: 'k-dramas',
@@ -149,7 +142,6 @@ export const buildHomeRows = ({
   resumeItems = [],
   trendingMovies = [],
   trendingShows = [],
-  trendingAnime = [],
   kDramas = [],
   topRated = [],
   categoryRows = []
@@ -187,12 +179,6 @@ export const buildHomeRows = ({
       title: 'Trending Shows',
       items: trendingShows,
       note: 'Series people are watching'
-    }),
-    createRow({
-      id: 'anime-spotlight',
-      title: 'Anime Spotlight',
-      items: trendingAnime,
-      note: 'Subbed and dubbed when available'
     }),
     createRow({
       id: 'k-dramas',

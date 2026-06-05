@@ -4,7 +4,6 @@ import { ChevronLeft, RefreshCw } from 'lucide-react';
 import {
   fetchDiscoverMovies,
   fetchDiscoverTV,
-  fetchTrendingAnime,
   fetchKDramas,
   fetchPopular,
   fetchTopRated,
@@ -57,10 +56,9 @@ const fetchBrowseItems = async (config) => {
   }
 
   if (config.source === 'tvHub') {
-    const [trending, kDramas, anime, drama, comedy] = await Promise.all([
+    const [trending, kDramas, drama, comedy] = await Promise.all([
       fetchTrendingTV(),
       fetchKDramas(),
-      fetchTrendingAnime({ perPage: 24 }),
       fetchDiscoverTV({ withGenres: '18', sortBy: 'popularity.desc' }),
       fetchDiscoverTV({ withGenres: '35', sortBy: 'popularity.desc' })
     ]);
@@ -68,7 +66,6 @@ const fetchBrowseItems = async (config) => {
     return mergeUniqueMediaItems([
       trending.results || [],
       kDramas.results || [],
-      anime.results || [],
       drama.results || [],
       comedy.results || []
     ]).slice(0, 72);
@@ -86,11 +83,6 @@ const fetchBrowseItems = async (config) => {
 
   if (config.source === 'trendingShows') {
     const data = await fetchTrendingTV();
-    return data.results || [];
-  }
-
-  if (config.source === 'animeTrending') {
-    const data = await fetchTrendingAnime({ perPage: 24 });
     return data.results || [];
   }
 

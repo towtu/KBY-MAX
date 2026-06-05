@@ -16,7 +16,6 @@ function App() {
           <Route path="/browse/:rowId" element={<Browse />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/tv/:id" element={<MovieDetail isTV={true} />} />
-          <Route path="/anime/:id" element={<MovieDetail isAnime={true} />} />
           <Route path="/search" element={<Search />} />
           {/* Add a fallback route */}
           <Route path="*" element={<Home />} />

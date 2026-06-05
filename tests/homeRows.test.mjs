@@ -18,12 +18,10 @@ test('buildHomeRows shows local resume before trending movies when items exist',
   const rows = buildHomeRows({
     resumeItems: [{ id: 1 }],
     trendingMovies: [{ id: 2 }],
-    trendingAnime: [{ id: 4 }],
     topTen: [{ id: 3 }]
   });
 
   assert.deepEqual(rows.slice(0, 3).map((row) => row.id), ['top-ten', 'resume', 'trending-movies']);
-  assert.equal(rows.some((row) => row.id === 'anime-spotlight'), true);
 });
 
 test('buildHomeRows gives content rows browse paths but leaves resume local', () => {
@@ -75,8 +73,9 @@ test('browse configs expose refined Movies and TV Shows hubs', () => {
 
   assert.equal(tvShows?.source, 'tvHub');
   assert.equal(tvShows?.title, 'TV Shows');
+  assert.equal(tvShows?.note, 'Series and K-dramas');
   assert.deepEqual(
     tvShows?.quickLinks?.map((link) => link.id),
-    ['trending-shows', 'k-dramas', 'anime-spotlight', 'tv-drama', 'tv-comedy']
+    ['trending-shows', 'k-dramas', 'tv-drama', 'tv-comedy']
   );
 });

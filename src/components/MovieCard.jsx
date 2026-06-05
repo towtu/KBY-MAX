@@ -25,7 +25,7 @@ export default function MovieCard({ movie }) {
   
   const title = getMovieTitle(movie);
   const mediaType = getMediaType(movie);
-  const mediaLabel = mediaType === 'anime' ? 'Anime' : mediaType === 'tv' ? 'Series' : 'Movie';
+  const mediaLabel = mediaType === 'tv' ? 'Series' : 'Movie';
   const linkTo = getMediaLink(movie);
   const date = movie.release_date || movie.first_air_date;
   const year = date ? new Date(date).getFullYear() : '';

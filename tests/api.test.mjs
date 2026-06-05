@@ -1,16 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  fetchAnimeDetails,
   fetchDiscoverMovies,
   fetchDiscoverTV,
   fetchJson,
   fetchSeasonDetails,
-  fetchTrendingAnime,
   fetchTrendingMovies,
   fetchTrendingTV,
   getImageUrl,
-  searchAnime
 } from '../src/api.js';
 
 test('fetchJson times out when the movie API request never settles', async () => {
@@ -88,45 +85,4 @@ test('fetchSeasonDetails calls the TMDB season endpoint', async () => {
   await fetchSeasonDetails(1399, 2, { fetcher });
 
   assert.equal(urls[0], 'https://api.themoviedb.org/3/tv/1399/season/2?language=en-US');
-});
-
-test('fetchTrendingAnime calls AniList public GraphQL', async () => {
-  const requests = [];
-  const fetcher = async (url, options) => {
-    requests.push({ url, options });
-    return { ok: true, json: async () => ({ data: { Page: { media: [] } } }) };
-  };
-
-  await fetchTrendingAnime({ fetcher, perPage: 12 });
-
-  assert.equal(requests[0].url, 'https://graphql.anilist.co');
-  assert.equal(requests[0].options.method, 'POST');
-  assert.match(requests[0].options.body, /TRENDING_DESC/);
-});
-
-test('fetchAnimeDetails requests one AniList media item', async () => {
-  const requests = [];
-  const fetcher = async (url, options) => {
-    requests.push({ url, options });
-    return { ok: true, json: async () => ({ data: { Media: { id: 21 } } }) };
-  };
-
-  await fetchAnimeDetails(21, { fetcher });
-
-  assert.equal(requests[0].url, 'https://graphql.anilist.co');
-  assert.match(requests[0].options.body, /Media\(id: \$id, type: ANIME\)/);
-});
-
-test('searchAnime calls AniList search with the query text', async () => {
-  const requests = [];
-  const fetcher = async (url, options) => {
-    requests.push({ url, options });
-    return { ok: true, json: async () => ({ data: { Page: { media: [] } } }) };
-  };
-
-  await searchAnime('one piece', { fetcher, perPage: 4 });
-
-  assert.equal(requests[0].url, 'https://graphql.anilist.co');
-  assert.match(requests[0].options.body, /SEARCH_MATCH/);
-  assert.match(requests[0].options.body, /one piece/);
 });

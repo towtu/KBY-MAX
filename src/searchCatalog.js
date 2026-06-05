@@ -2,12 +2,10 @@ import {
   fetchDiscoverMovies,
   fetchKDramas,
   fetchPopular,
-  fetchTrendingAnime,
   fetchTopRated,
   fetchTrending,
   fetchTrendingMovies,
   fetchTrendingTV,
-  searchAnime,
   searchMovies
 } from './api.js';
 import { MOVIE_CATEGORY_ROWS } from './homeRows.js';
@@ -122,7 +120,6 @@ export const fetchSearchCatalog = async () => {
     fetchPopular(),
     fetchTrendingMovies(),
     fetchTrendingTV(),
-    fetchTrendingAnime(),
     fetchKDramas(),
     fetchTopRated(),
     ...MOVIE_CATEGORY_ROWS.map((row) => fetchDiscoverMovies({
@@ -137,16 +134,14 @@ export const fetchSearchCatalog = async () => {
 export const searchMoviesWithFallback = async (query) => {
   if (!query?.trim()) return { results: [], usedFallback: false };
 
-  const [movieSearch, animeSearch] = await Promise.allSettled([
-    searchMovies(query),
-    searchAnime(query)
+  const [movieSearch] = await Promise.allSettled([
+    searchMovies(query)
   ]);
   const remoteData = movieSearch.status === 'fulfilled'
     ? movieSearch.value
     : { results: [] };
   const remoteResults = dedupeResults([
-    ...(movieSearch.status === 'fulfilled' ? movieSearch.value.results || [] : []),
-    ...(animeSearch.status === 'fulfilled' ? animeSearch.value.results || [] : [])
+    ...(movieSearch.status === 'fulfilled' ? movieSearch.value.results || [] : [])
   ]);
 
   if (remoteResults.length >= 6) {

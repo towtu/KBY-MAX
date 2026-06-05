@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Play, Info, ChevronRight, ChevronLeft, RefreshCw } from 'lucide-react';
 import {
   fetchDiscoverMovies,
-  fetchTrendingAnime,
   fetchKDramas,
   fetchPopular,
   fetchTopRated,
@@ -23,7 +22,6 @@ const EMPTY_HOME_DATA = {
   topTen: [],
   trendingMovies: [],
   trendingShows: [],
-  trendingAnime: [],
   kDramas: [],
   topRated: [],
   categoryRows: []
@@ -108,7 +106,6 @@ export default function Home() {
         topTenSettled,
         trendingMoviesSettled,
         trendingShowsSettled,
-        trendingAnimeSettled,
         kDramasSettled,
         topRatedSettled,
         categoryRowsSettled
@@ -117,7 +114,6 @@ export default function Home() {
         fetchPopular(),
         fetchTrendingMovies(),
         fetchTrendingTV(),
-        fetchTrendingAnime(),
         fetchKDramas(),
         fetchTopRated(),
         Promise.allSettled(categoryRequests)
@@ -128,7 +124,6 @@ export default function Home() {
         topTen: getSettledResults(topTenSettled),
         trendingMovies: getSettledResults(trendingMoviesSettled),
         trendingShows: getSettledResults(trendingShowsSettled),
-        trendingAnime: getSettledResults(trendingAnimeSettled),
         kDramas: getSettledResults(kDramasSettled),
         topRated: getSettledResults(topRatedSettled),
         categoryRows: categoryRowsSettled.status === 'fulfilled'
@@ -143,7 +138,6 @@ export default function Home() {
         nextData.topTen,
         nextData.trendingMovies,
         nextData.trendingShows,
-        nextData.trendingAnime,
         nextData.kDramas,
         nextData.topRated,
         ...nextData.categoryRows.map((row) => row.items)
@@ -172,7 +166,6 @@ export default function Home() {
       resumeItems: resumeItems.map(resumeItemToMovie),
       trendingMovies: homeData.trendingMovies.slice(0, 18),
       trendingShows: homeData.trendingShows.slice(0, 18),
-      trendingAnime: homeData.trendingAnime.slice(0, 18),
       kDramas: homeData.kDramas.slice(0, 18),
       topRated: homeData.topRated.slice(0, 18),
       categoryRows: homeData.categoryRows.map((row) => ({

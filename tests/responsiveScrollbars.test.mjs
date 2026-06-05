@@ -16,7 +16,6 @@ test('global scrollbar colors are customized for Firefox and WebKit', () => {
 
 test('horizontal media rails use custom scrollbars instead of browser defaults', () => {
   assert.match(detailCss, /\.episode-strip::-webkit-scrollbar/);
-  assert.match(detailCss, /\.anime-episode-strip::-webkit-scrollbar/);
   assert.match(detailCss, /\.cast-list::-webkit-scrollbar/);
   assert.match(detailCss, /scrollbar-color:\s*var\(--scrollbar-thumb\)\s+var\(--scrollbar-rail\)/);
 });

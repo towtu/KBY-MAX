@@ -38,19 +38,19 @@ test('saveResumeItem stores progress items sorted by most recent update', () => 
   assert.deepEqual(getResumeItems(storage).map((item) => item.id), [2, 1]);
 });
 
-test('saveResumeItem keeps anime as its own media type', () => {
+test('saveResumeItem ignores unsupported media types', () => {
   const storage = createStorage();
 
   const items = saveResumeItem({
     id: 21,
-    mediaType: 'anime',
-    title: 'One Piece',
-    posterPath: '/one-piece.jpg',
+    mediaType: 'clip',
+    title: 'Unsupported Clip',
+    posterPath: '/clip.jpg',
     progress: 95,
     updatedAt: 100
   }, storage);
 
-  assert.equal(items[0].mediaType, 'anime');
+  assert.deepEqual(items, []);
 });
 
 test('saveResumeItem ignores entries without progress', () => {
@@ -68,26 +68,33 @@ test('saveResumeItem ignores entries without progress', () => {
   assert.deepEqual(getResumeItems(storage), []);
 });
 
-test('mapResumeItemsForCards converts local progress items into MovieCard data', () => {
+test('mapResumeItemsForCards converts movie and series progress items into MovieCard data', () => {
   assert.deepEqual(
     mapResumeItemsForCards([
       {
         id: 21,
-        mediaType: 'anime',
-        title: 'One Piece',
-        posterPath: 'https://img.example/poster.jpg',
-        backdropPath: 'https://img.example/backdrop.jpg'
+        mediaType: 'movie',
+        title: 'Movie',
+        posterPath: 'https://img.example/movie.jpg',
+        backdropPath: 'https://img.example/movie-backdrop.jpg'
+      },
+      {
+        id: 22,
+        mediaType: 'clip',
+        title: 'Unsupported Clip',
+        posterPath: 'https://img.example/clip.jpg',
+        backdropPath: 'https://img.example/clip-backdrop.jpg'
       }
     ]),
     [
       {
         id: 21,
-        media_type: 'anime',
-        mediaType: 'anime',
-        title: 'One Piece',
-        name: 'One Piece',
-        poster_path: 'https://img.example/poster.jpg',
-        backdrop_path: 'https://img.example/backdrop.jpg'
+        media_type: 'movie',
+        mediaType: 'movie',
+        title: 'Movie',
+        name: 'Movie',
+        poster_path: 'https://img.example/movie.jpg',
+        backdrop_path: 'https://img.example/movie-backdrop.jpg'
       }
     ]
   );

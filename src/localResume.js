@@ -1,5 +1,6 @@
 export const RESUME_STORAGE_KEY = 'kby_max_resume_items';
 const MAX_RESUME_ITEMS = 12;
+const ALLOWED_RESUME_MEDIA_TYPES = ['movie', 'tv'];
 
 const getStorage = () => {
   if (typeof window === 'undefined') return null;
@@ -10,10 +11,10 @@ const normalizeItem = (item) => {
   const id = Number(item?.id);
   const progress = Number(item?.progress);
   const updatedAt = Number(item?.updatedAt) || Date.now();
-  const mediaType = ['movie', 'tv', 'anime'].includes(item?.mediaType) ? item.mediaType : 'movie';
+  const mediaType = item?.mediaType;
   const title = typeof item?.title === 'string' ? item.title.trim() : '';
 
-  if (!id || !title || !Number.isFinite(progress) || progress <= 0) {
+  if (!ALLOWED_RESUME_MEDIA_TYPES.includes(mediaType) || !id || !title || !Number.isFinite(progress) || progress <= 0) {
     return null;
   }
 
@@ -50,8 +51,7 @@ export const saveResumeItem = (item, storage = getStorage()) => {
 
   const normalized = normalizeItem(item);
   const existingItems = getResumeItems(storage).filter((existing) => {
-    const mediaType = ['movie', 'tv', 'anime'].includes(item?.mediaType) ? item.mediaType : 'movie';
-    return existing.id !== Number(item?.id) || existing.mediaType !== mediaType;
+    return existing.id !== Number(item?.id) || existing.mediaType !== item?.mediaType;
   });
   const nextItems = normalized ? [normalized, ...existingItems].slice(0, MAX_RESUME_ITEMS) : existingItems;
 
@@ -60,7 +60,7 @@ export const saveResumeItem = (item, storage = getStorage()) => {
 };
 
 export const mapResumeItemsForCards = (items = []) => (
-  items.map((item) => ({
+  items.filter((item) => ALLOWED_RESUME_MEDIA_TYPES.includes(item.mediaType)).map((item) => ({
     id: item.id,
     media_type: item.mediaType,
     mediaType: item.mediaType,

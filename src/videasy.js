@@ -52,25 +52,3 @@ export const buildVideasyTvUrl = ({ id, season = 1, episode = 1, progress = 0 })
 
   return buildUrl(`/tv/${id}/${season || 1}/${episode || 1}`, params);
 };
-
-export const buildVideasyAnimeUrl = ({ id, episode, progress = 0 }) => {
-  const path = episode ? `/anime/${id}/${episode}` : `/anime/${id}`;
-  const params = episode
-    ? [
-      ['color', VIDEASY_COLOR],
-      ['episodeSelector', true],
-      ['overlay', true],
-      ['category', 'sub']
-    ]
-    : [
-      ['color', VIDEASY_COLOR],
-      ['overlay', true]
-    ];
-  const normalizedProgress = normalizeProgress(progress);
-
-  if (normalizedProgress > 0) {
-    params.push(['progress', normalizedProgress]);
-  }
-
-  return buildUrl(path, params);
-};

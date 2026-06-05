@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Star, Clock, Calendar, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
-  fetchAnimeDetails,
   fetchMovieDetails,
   fetchSeasonDetails,
   fetchTVDetails,
@@ -11,9 +10,8 @@ import {
 import MovieCard from '../components/MovieCard';
 import { saveResumeItem } from '../localResume';
 import { getMovieTitle } from '../movieLinks';
-import { getAnimePlayerEpisode, getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
+import { getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
 import {
-  buildVideasyAnimeUrl,
   buildVideasyMovieUrl,
   buildVideasyTvUrl
 } from '../videasy';
@@ -21,7 +19,6 @@ import './MovieDetail.css';
 
 const getProgressKey = ({ mediaType, id, season, episode }) => {
   if (mediaType === 'tv') return `movie_progress_tv_${id}_${season || 1}_${episode || 1}`;
-  if (mediaType === 'anime') return `movie_progress_anime_${id}_${episode || 'movie'}`;
   return `movie_progress_movie_${id}`;
 };
 
@@ -41,7 +38,7 @@ const getRecommendationItems = (movie = {}) => {
   });
 };
 
-const getCrewFacts = (movie = {}, mediaType) => {
+const getCrewFacts = (movie = {}) => {
   const facts = [];
 
   movie.created_by?.forEach((person) => {
@@ -54,12 +51,6 @@ const getCrewFacts = (movie = {}, mediaType) => {
       facts.push({ label: person.job, name: person.name, id: `${person.job}-${person.id}` });
     });
 
-  if (mediaType === 'anime') {
-    if (movie.format) facts.push({ label: 'Format', name: movie.format.replace(/_/g, ' '), id: 'anime-format' });
-    if (movie.episodes) facts.push({ label: 'Episodes', name: String(movie.episodes), id: 'anime-episodes' });
-    if (movie.status) facts.push({ label: 'Status', name: movie.status.replace(/_/g, ' '), id: 'anime-status' });
-  }
-
   const seen = new Set();
   return facts.filter((fact) => {
     const key = `${fact.label}-${fact.name}`;
@@ -69,26 +60,24 @@ const getCrewFacts = (movie = {}, mediaType) => {
   }).slice(0, 6);
 };
 
-export default function MovieDetail({ isTV = false, isAnime = false }) {
+export default function MovieDetail({ isTV = false }) {
   const { id } = useParams();
-  const mediaType = isAnime ? 'anime' : isTV ? 'tv' : 'movie';
+  const mediaType = isTV ? 'tv' : 'movie';
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seasons, setSeasons] = useState([]);
   const [episodes, setEpisodes] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
-  const [selectedAnimeEpisode, setSelectedAnimeEpisode] = useState(1);
   const [selectedPlayerId, setSelectedPlayerId] = useState('');
   const tvEpisodeRailRef = useRef(null);
-  const animeEpisodeRailRef = useRef(null);
 
   const progressKey = useMemo(() => getProgressKey({
     mediaType,
     id,
     season: selectedSeason,
-    episode: mediaType === 'anime' ? selectedAnimeEpisode : selectedEpisode
-  }), [id, mediaType, selectedAnimeEpisode, selectedEpisode, selectedSeason]);
+    episode: selectedEpisode
+  }), [id, mediaType, selectedEpisode, selectedSeason]);
 
   const startProgress = useMemo(() => {
     if (typeof window === 'undefined') return 0;
@@ -106,14 +95,11 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
         setEpisodes([]);
         setSelectedSeason(1);
         setSelectedEpisode(1);
-        setSelectedAnimeEpisode(1);
         setSelectedPlayerId('');
 
-        const data = isAnime
-          ? await fetchAnimeDetails(id)
-          : isTV
-            ? await fetchTVDetails(id)
-            : await fetchMovieDetails(id);
+        const data = isTV
+          ? await fetchTVDetails(id)
+          : await fetchMovieDetails(id);
 
         if (!active) return;
         setMovie(data);
@@ -147,7 +133,7 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
     return () => {
       active = false;
     };
-  }, [id, isAnime, isTV]);
+  }, [id, isTV]);
 
   const handleSeasonChange = useCallback(async (seasonNumber) => {
     setSelectedSeason(seasonNumber);
@@ -247,21 +233,8 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
   const year = getDisplayYear(movie);
   const runtimeLabel = getRuntimeLabel(movie);
   const scoreLabel = getScoreLabel(movie);
-  const mediaLabel = mediaType === 'anime' ? 'Anime' : mediaType === 'tv' ? 'Series' : 'Movie';
-  const animeEpisodeCards = movie.animeEpisodes?.length > 0
-    ? movie.animeEpisodes
-    : [{ episode_number: 1, name: 'Episode 1', still_path: movie.backdrop_path || movie.poster_path }];
-  const animePlayerEpisode = mediaType === 'anime'
-    ? getAnimePlayerEpisode({ format: movie.format, selectedEpisode: selectedAnimeEpisode })
-    : undefined;
-  const showAnimeEpisodes = mediaType === 'anime' && animePlayerEpisode !== undefined && animeEpisodeCards.length > 0;
-  const videasySrc = mediaType === 'anime'
-    ? buildVideasyAnimeUrl({
-      id: movie.id,
-      episode: animePlayerEpisode,
-      progress: startProgress
-    })
-    : mediaType === 'tv'
+  const mediaLabel = mediaType === 'tv' ? 'Series' : 'Movie';
+  const videasySrc = mediaType === 'tv'
       ? buildVideasyTvUrl({
         id: movie.id,
         season: selectedSeason,
@@ -277,7 +250,7 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
   ].filter((option) => option.src);
   const selectedPlayer = playerOptions.find((option) => option.id === selectedPlayerId) || playerOptions[0];
   const iframeSrc = selectedPlayer?.src || videasySrc;
-  const crewFacts = getCrewFacts(movie, mediaType);
+  const crewFacts = getCrewFacts(movie);
   const recommendationItems = getRecommendationItems(movie).slice(0, 12);
 
   return (
@@ -427,36 +400,6 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-          {showAnimeEpisodes && (
-            <div className="anime-episode-panel" aria-label="Select anime episode">
-              <div className="season-tabs anime-season-tabs" aria-label="Anime season">
-                <button type="button" className="active">S1</button>
-              </div>
-              <div className="episode-rail-shell">
-                {renderEpisodeRailControls(animeEpisodeRailRef, 'anime episodes')}
-                <div ref={animeEpisodeRailRef} className="anime-episode-strip" aria-label="Select anime episode">
-                  {animeEpisodeCards.map((episode) => (
-                    <button
-                      key={episode.episode_number}
-                      type="button"
-                      className={`anime-episode-card ${selectedAnimeEpisode === episode.episode_number ? 'active' : ''}`}
-                      onClick={() => setSelectedAnimeEpisode(episode.episode_number)}
-                      aria-label={`Episode ${episode.episode_number}`}
-                    >
-                      {episode.still_path ? (
-                        <img src={getImageUrl(episode.still_path)} alt="" loading="lazy" />
-                      ) : (
-                        <span className="episode-placeholder">E{episode.episode_number}</span>
-                      )}
-                      <span>Episode {episode.episode_number}</span>
-                      <strong>{episode.name || `Episode ${episode.episode_number}`}</strong>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
 

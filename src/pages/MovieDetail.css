@@ -299,8 +299,7 @@
   border-color: #17c3d1;
 }
 
-.episode-strip,
-.anime-episode-strip {
+.episode-strip {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(190px, 240px);
@@ -385,14 +384,12 @@
 
 .season-tabs::-webkit-scrollbar,
 .episode-strip::-webkit-scrollbar,
-.anime-episode-strip::-webkit-scrollbar,
 .cast-list::-webkit-scrollbar {
   height: 10px;
 }
 
 .season-tabs::-webkit-scrollbar-track,
 .episode-strip::-webkit-scrollbar-track,
-.anime-episode-strip::-webkit-scrollbar-track,
 .cast-list::-webkit-scrollbar-track {
   background: var(--scrollbar-rail);
   border-radius: 999px;
@@ -400,7 +397,6 @@
 
 .season-tabs::-webkit-scrollbar-thumb,
 .episode-strip::-webkit-scrollbar-thumb,
-.anime-episode-strip::-webkit-scrollbar-thumb,
 .cast-list::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border: 2px solid var(--scrollbar-rail);
@@ -409,13 +405,11 @@
 
 .season-tabs::-webkit-scrollbar-thumb:hover,
 .episode-strip::-webkit-scrollbar-thumb:hover,
-.anime-episode-strip::-webkit-scrollbar-thumb:hover,
 .cast-list::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-active);
 }
 
-.episode-card,
-.anime-episode-card {
+.episode-card {
   min-height: 178px;
   padding: 0;
   overflow: hidden;
@@ -430,22 +424,18 @@
 }
 
 .episode-card:hover,
-.episode-card:focus-visible,
-.anime-episode-card:hover,
-.anime-episode-card:focus-visible {
+.episode-card:focus-visible {
   transform: translateY(-2px);
   background: #151f2c;
   border-color: rgba(23, 195, 209, 0.42);
 }
 
-.episode-card.active,
-.anime-episode-card.active {
+.episode-card.active {
   border-color: #17c3d1;
   box-shadow: 0 0 0 1px #17c3d1;
 }
 
 .episode-card img,
-.anime-episode-card img,
 .episode-placeholder {
   display: grid;
   place-items: center;
@@ -459,15 +449,12 @@
 }
 
 .episode-card span,
-.episode-card strong,
-.anime-episode-card span,
-.anime-episode-card strong {
+.episode-card strong {
   display: block;
   padding-inline: 0.8rem;
 }
 
-.episode-card span,
-.anime-episode-card span {
+.episode-card span {
   margin-top: 0.65rem;
   color: #17c3d1;
   font-size: 0.72rem;
@@ -476,25 +463,12 @@
   letter-spacing: 0.08em;
 }
 
-.episode-card strong,
-.anime-episode-card strong {
+.episode-card strong {
   margin: 0.24rem 0 0.75rem;
   min-height: 2.5em;
   color: #f8fafc;
   font-size: 0.92rem;
   line-height: 1.25;
-}
-
-.anime-episode-panel {
-  margin-bottom: 1rem;
-  padding: 0.85rem;
-  border-radius: 8px;
-  background: #070a0f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.anime-season-tabs {
-  padding-bottom: 0.85rem;
 }
 
 .player-heading h2,
@@ -719,8 +693,7 @@
     gap: 0.75rem;
   }
 
-  .episode-strip,
-  .anime-episode-strip {
+  .episode-strip {
     grid-auto-columns: minmax(158px, 74vw);
     padding-inline: 0;
     scroll-padding-inline: 0;
@@ -787,8 +760,7 @@
     font-size: 1rem;
   }
 
-  .episode-strip,
-  .anime-episode-strip {
+  .episode-strip {
     grid-auto-columns: minmax(260px, 320px);
     gap: 1rem;
     padding-bottom: 0.95rem;
@@ -811,19 +783,16 @@
     height: 32px;
   }
 
-  .episode-card,
-  .anime-episode-card {
+  .episode-card {
     min-height: 226px;
     border-radius: 10px;
   }
 
-  .episode-card span,
-  .anime-episode-card span {
+  .episode-card span {
     font-size: 0.82rem;
   }
 
-  .episode-card strong,
-  .anime-episode-card strong {
+  .episode-card strong {
     font-size: 1.08rem;
   }
 
@@ -865,15 +834,13 @@
     padding: 2.4rem;
   }
 
-  .episode-strip,
-  .anime-episode-strip {
+  .episode-strip {
     grid-auto-columns: minmax(320px, 390px);
     padding-inline: 5.5rem;
     scroll-padding-inline: 5.5rem;
   }
 
-  .episode-card,
-  .anime-episode-card {
+  .episode-card {
     min-height: 266px;
   }
 
