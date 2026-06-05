@@ -514,6 +514,44 @@
 
 }
 
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 520px) {
+  .hero-section {
+    min-height: 620px;
+    padding: 104px 0 4rem;
+  }
+
+  .hero-layout {
+    grid-template-columns: minmax(360px, 0.9fr) minmax(360px, 1.1fr);
+    gap: clamp(2rem, 4vw, 4.5rem);
+    align-items: center;
+  }
+
+  .hero-content {
+    max-width: 620px;
+    padding-bottom: 0;
+  }
+
+  .hero-title {
+    max-width: 620px;
+    font-size: clamp(3.6rem, 5.4vw, 5.8rem);
+  }
+
+  .hero-overview {
+    max-width: 540px;
+    margin-bottom: 1.6rem;
+    -webkit-line-clamp: 3;
+  }
+
+  .hero-media {
+    justify-self: stretch;
+    min-height: clamp(330px, 34vw, 500px);
+  }
+
+  .hero-carousel-card {
+    width: min(82%, 680px);
+  }
+}
+
 @media (max-width: 768px) {
   .hero-section {
     min-height: auto;

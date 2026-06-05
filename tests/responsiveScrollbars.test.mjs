@@ -27,6 +27,13 @@ test('home and detail layouts include TV-sized responsive rules', () => {
   assert.match(detailCss, /@media \(min-width:\s*2400px\)/);
 });
 
+test('home hero keeps the carousel beside the title on landscape TV viewports', () => {
+  assert.match(
+    homeCss,
+    /@media \(orientation:\s*landscape\) and \(min-width:\s*900px\) and \(min-height:\s*520px\) \{[\s\S]*?\.hero-layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(360px,\s*0\.9fr\) minmax\(360px,\s*1\.1fr\);[\s\S]*?\.hero-media\s*\{[\s\S]*?justify-self:\s*stretch;/
+  );
+});
+
 test('episode rails expose remote-friendly scroll controls', () => {
   assert.match(detailJsx, /episode-rail-shell/);
   assert.match(detailJsx, /episode-rail-control left/);
