@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="KBY MAX">
+  <rect width="64" height="64" rx="18" fill="#05070a"/>
+  <rect x="7" y="7" width="50" height="50" rx="15" fill="#071019" stroke="#f8fafc" stroke-width="3"/>
+  <text x="32" y="30" text-anchor="middle" fill="#f8fafc" font-family="Arial Rounded MT Bold, Trebuchet MS, Arial, sans-serif" font-size="18" font-weight="900">KBY</text>
+  <rect x="14" y="36" width="36" height="15" rx="7.5" fill="#f8fafc"/>
+  <text x="32" y="48" text-anchor="middle" fill="#05070a" font-family="Arial Rounded MT Bold, Trebuchet MS, Arial, sans-serif" font-size="12" font-weight="900">MAX</text>
+</svg>
