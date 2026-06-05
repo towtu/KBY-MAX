@@ -30,7 +30,7 @@ test('buildVideasyTvUrl builds a TV embed with episode controls enabled', () => 
 test('buildVideasyAnimeUrl supports anime shows and anime movies', () => {
   assert.equal(
     buildVideasyAnimeUrl({ id: 21, episode: 1 }),
-    'https://player.videasy.net/anime/21/1?color=17c3d1&episodeSelector=true&overlay=true'
+    'https://player.videasy.net/anime/21/1?color=17c3d1&episodeSelector=true&overlay=true&category=sub'
   );
   assert.equal(
     buildVideasyAnimeUrl({ id: 145139 }),

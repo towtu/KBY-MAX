@@ -11,7 +11,7 @@ import {
 import MovieCard from '../components/MovieCard';
 import { saveResumeItem } from '../localResume';
 import { getMovieTitle } from '../movieLinks';
-import { getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
+import { getAnimePlayerEpisode, getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
 import {
   buildVideasyAnimeUrl,
   buildVideasyMovieUrl,
@@ -251,11 +251,14 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
   const animeEpisodeCards = movie.animeEpisodes?.length > 0
     ? movie.animeEpisodes
     : [{ episode_number: 1, name: 'Episode 1', still_path: movie.backdrop_path || movie.poster_path }];
-  const hasAnimeEpisodes = mediaType === 'anime' && animeEpisodeCards.length > 1;
+  const animePlayerEpisode = mediaType === 'anime'
+    ? getAnimePlayerEpisode({ format: movie.format, selectedEpisode: selectedAnimeEpisode })
+    : undefined;
+  const showAnimeEpisodes = mediaType === 'anime' && animePlayerEpisode !== undefined && animeEpisodeCards.length > 0;
   const videasySrc = mediaType === 'anime'
     ? buildVideasyAnimeUrl({
       id: movie.id,
-      episode: hasAnimeEpisodes ? selectedAnimeEpisode : undefined,
+      episode: animePlayerEpisode,
       progress: startProgress
     })
     : mediaType === 'tv'
@@ -427,7 +430,7 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
             </div>
           )}
 
-          {hasAnimeEpisodes && (
+          {showAnimeEpisodes && (
             <div className="anime-episode-panel" aria-label="Select anime episode">
               <div className="season-tabs anime-season-tabs" aria-label="Anime season">
                 <button type="button" className="active">S1</button>

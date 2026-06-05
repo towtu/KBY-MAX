@@ -59,7 +59,8 @@ export const buildVideasyAnimeUrl = ({ id, episode, progress = 0 }) => {
     ? [
       ['color', VIDEASY_COLOR],
       ['episodeSelector', true],
-      ['overlay', true]
+      ['overlay', true],
+      ['category', 'sub']
     ]
     : [
       ['color', VIDEASY_COLOR],
