@@ -13,9 +13,6 @@ import { saveResumeItem } from '../localResume';
 import { getMovieTitle } from '../movieLinks';
 import { getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
 import {
-  buildVidLinkAnimeUrl,
-  buildVidLinkMovieUrl,
-  buildVidLinkTvUrl,
   buildVideasyAnimeUrl,
   buildVideasyMovieUrl,
   buildVideasyTvUrl
@@ -272,35 +269,8 @@ export default function MovieDetail({ isTV = false, isAnime = false }) {
         id: movie.id,
         progress: startProgress
       });
-  const vidLinkSrc = mediaType === 'anime'
-    ? movie.mal_id
-      ? buildVidLinkAnimeUrl({
-        malId: movie.mal_id,
-        episode: hasAnimeEpisodes ? selectedAnimeEpisode : 1,
-        progress: startProgress
-      })
-      : ''
-    : mediaType === 'tv'
-      ? buildVidLinkTvUrl({
-        id: movie.id,
-        season: selectedSeason,
-        episode: selectedEpisode,
-        progress: startProgress
-      })
-      : buildVidLinkMovieUrl({
-        id: movie.id,
-        progress: startProgress
-      });
   const playerOptions = [
-    ...(mediaType === 'movie'
-      ? [
-        { id: 'videasy', label: 'Server 1', name: 'Videasy', src: videasySrc },
-        { id: 'vidlink', label: 'Server 2', name: 'VidLink', src: vidLinkSrc }
-      ]
-      : [
-        ...(vidLinkSrc ? [{ id: 'vidlink', label: 'Server 1', name: 'VidLink', src: vidLinkSrc }] : []),
-        { id: 'videasy', label: vidLinkSrc ? 'Server 2' : 'Server 1', name: 'Videasy', src: videasySrc }
-      ])
+    { id: 'videasy', label: 'Server 1', name: 'Videasy', src: videasySrc }
   ].filter((option) => option.src);
   const selectedPlayer = playerOptions.find((option) => option.id === selectedPlayerId) || playerOptions[0];
   const iframeSrc = selectedPlayer?.src || videasySrc;

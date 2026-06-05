@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import * as playerUrls from '../src/videasy.js';
 import {
-  buildVidLinkAnimeUrl,
-  buildVidLinkMovieUrl,
-  buildVidLinkTvUrl,
   buildVideasyAnimeUrl,
   buildVideasyMovieUrl,
   buildVideasyTvUrl
 } from '../src/videasy.js';
+
+test('player url module only exposes Videasy builders', () => {
+  const backupPlayerExports = Object.keys(playerUrls).filter((key) => key.toLowerCase().includes('vidlink'));
+
+  assert.deepEqual(backupPlayerExports, []);
+});
 
 test('buildVideasyMovieUrl builds a branded movie embed with overlay and progress', () => {
   assert.equal(
@@ -31,26 +35,5 @@ test('buildVideasyAnimeUrl supports anime shows and anime movies', () => {
   assert.equal(
     buildVideasyAnimeUrl({ id: 145139 }),
     'https://player.videasy.net/anime/145139?color=17c3d1&overlay=true'
-  );
-});
-
-test('buildVidLinkTvUrl builds a backup TV embed with custom colors', () => {
-  assert.equal(
-    buildVidLinkTvUrl({ id: 94997, season: 1, episode: 2, progress: 60 }),
-    'https://vidlink.pro/tv/94997/1/2?primaryColor=17c3d1&secondaryColor=101720&iconColor=f8fafc&icons=default&player=default&title=true&poster=true&autoplay=false&nextbutton=true&startAt=60'
-  );
-});
-
-test('buildVidLinkAnimeUrl uses MyAnimeList id and fallback sub/dub support', () => {
-  assert.equal(
-    buildVidLinkAnimeUrl({ malId: 21, episode: 4 }),
-    'https://vidlink.pro/anime/21/4/sub?fallback=true&primaryColor=17c3d1&secondaryColor=101720&iconColor=f8fafc&icons=default&player=default&title=true&poster=true&autoplay=false&nextbutton=true'
-  );
-});
-
-test('buildVidLinkMovieUrl builds a backup movie embed', () => {
-  assert.equal(
-    buildVidLinkMovieUrl({ id: 786892 }),
-    'https://vidlink.pro/movie/786892?primaryColor=17c3d1&secondaryColor=101720&iconColor=f8fafc&icons=default&player=default&title=true&poster=true&autoplay=false'
   );
 });
