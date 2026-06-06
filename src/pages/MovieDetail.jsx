@@ -11,10 +11,7 @@ import MovieCard from '../components/MovieCard';
 import { saveResumeItem } from '../localResume';
 import { getMovieTitle } from '../movieLinks';
 import { getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
-import {
-  buildVideasyMovieUrl,
-  buildVideasyTvUrl
-} from '../videasy';
+import { buildPlayerOptions } from '../videasy';
 import './MovieDetail.css';
 
 const getProgressKey = ({ mediaType, id, season, episode }) => {
@@ -234,22 +231,15 @@ export default function MovieDetail({ isTV = false }) {
   const runtimeLabel = getRuntimeLabel(movie);
   const scoreLabel = getScoreLabel(movie);
   const mediaLabel = mediaType === 'tv' ? 'Series' : 'Movie';
-  const videasySrc = mediaType === 'tv'
-      ? buildVideasyTvUrl({
-        id: movie.id,
-        season: selectedSeason,
-        episode: selectedEpisode,
-        progress: startProgress
-      })
-      : buildVideasyMovieUrl({
-        id: movie.id,
-        progress: startProgress
-      });
-  const playerOptions = [
-    { id: 'videasy', label: 'Server 1', name: 'Videasy', src: videasySrc }
-  ].filter((option) => option.src);
+  const playerOptions = buildPlayerOptions({
+    mediaType,
+    id: movie.id,
+    season: selectedSeason,
+    episode: selectedEpisode,
+    progress: startProgress
+  });
   const selectedPlayer = playerOptions.find((option) => option.id === selectedPlayerId) || playerOptions[0];
-  const iframeSrc = selectedPlayer?.src || videasySrc;
+  const iframeSrc = selectedPlayer?.src || '';
   const crewFacts = getCrewFacts(movie);
   const recommendationItems = getRecommendationItems(movie).slice(0, 12);
 
@@ -347,18 +337,21 @@ export default function MovieDetail({ isTV = false }) {
               <p className="detail-eyebrow">Theatre mode</p>
               <h2>Watch {title}</h2>
             </div>
-            <div className="player-server-group" aria-label="Choose streaming server">
-              {playerOptions.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`player-server ${selectedPlayer?.id === option.id ? 'active' : ''}`}
-                  onClick={() => setSelectedPlayerId(option.id)}
-                >
-                  <span>{option.label}</span>
-                  <strong>{option.name}</strong>
-                </button>
-              ))}
+            <div className="player-server-controls">
+              <div className="player-server-group" aria-label="Choose streaming server">
+                {playerOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={`player-server ${selectedPlayer?.id === option.id ? 'active' : ''}`}
+                    onClick={() => setSelectedPlayerId(option.id)}
+                  >
+                    <span>{option.label}</span>
+                    <strong>{option.name}</strong>
+                  </button>
+                ))}
+              </div>
+              <p className="player-server-hint">If playback keeps loading, try the other server.</p>
             </div>
           </div>
 
