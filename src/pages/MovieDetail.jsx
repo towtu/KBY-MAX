@@ -11,7 +11,7 @@ import MovieCard from '../components/MovieCard';
 import { saveResumeItem } from '../localResume';
 import { getMovieTitle } from '../movieLinks';
 import { getDisplayYear, getRuntimeLabel, getScoreLabel } from '../movieDetailMeta';
-import { buildPlayerOptions } from '../videasy';
+import { buildPlayerOptions } from '../playerUrls';
 import './MovieDetail.css';
 
 const getProgressKey = ({ mediaType, id, season, episode }) => {
@@ -66,7 +66,6 @@ export default function MovieDetail({ isTV = false }) {
   const [episodes, setEpisodes] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
-  const [selectedPlayerId, setSelectedPlayerId] = useState('');
   const tvEpisodeRailRef = useRef(null);
 
   const progressKey = useMemo(() => getProgressKey({
@@ -92,7 +91,6 @@ export default function MovieDetail({ isTV = false }) {
         setEpisodes([]);
         setSelectedSeason(1);
         setSelectedEpisode(1);
-        setSelectedPlayerId('');
 
         const data = isTV
           ? await fetchTVDetails(id)
@@ -185,6 +183,8 @@ export default function MovieDetail({ isTV = false }) {
 
   useEffect(() => {
     const handlePlayerMessage = (event) => {
+      if (event.origin !== 'https://zoryva.me') return;
+
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
@@ -231,15 +231,13 @@ export default function MovieDetail({ isTV = false }) {
   const runtimeLabel = getRuntimeLabel(movie);
   const scoreLabel = getScoreLabel(movie);
   const mediaLabel = mediaType === 'tv' ? 'Series' : 'Movie';
-  const playerOptions = buildPlayerOptions({
+  const iframeSrc = buildPlayerOptions({
     mediaType,
     id: movie.id,
     season: selectedSeason,
     episode: selectedEpisode,
     progress: startProgress
-  });
-  const selectedPlayer = playerOptions.find((option) => option.id === selectedPlayerId) || playerOptions[0];
-  const iframeSrc = selectedPlayer?.src || '';
+  })[0]?.src || '';
   const crewFacts = getCrewFacts(movie);
   const recommendationItems = getRecommendationItems(movie).slice(0, 12);
 
@@ -337,22 +335,6 @@ export default function MovieDetail({ isTV = false }) {
               <p className="detail-eyebrow">Theatre mode</p>
               <h2>Watch {title}</h2>
             </div>
-            <div className="player-server-controls">
-              <div className="player-server-group" aria-label="Choose streaming server">
-                {playerOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={`player-server ${selectedPlayer?.id === option.id ? 'active' : ''}`}
-                    onClick={() => setSelectedPlayerId(option.id)}
-                  >
-                    <span>{option.label}</span>
-                    <strong>{option.name}</strong>
-                  </button>
-                ))}
-              </div>
-              <p className="player-server-hint">If playback keeps loading, try the other server.</p>
-            </div>
           </div>
 
           {mediaType === 'tv' && seasons.length > 0 && (
@@ -404,7 +386,8 @@ export default function MovieDetail({ isTV = false }) {
               height="100%"
               frameBorder="0"
               allowFullScreen
-              allow="encrypted-media; autoplay; picture-in-picture"
+              allow="autoplay; picture-in-picture"
+              style={{ border: 0, borderRadius: '12px' }}
               title={`Watch ${title}`}
             ></iframe>
           </div>

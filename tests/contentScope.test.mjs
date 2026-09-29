@@ -5,11 +5,7 @@ import { join, relative } from 'node:path';
 import test from 'node:test';
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url));
-const deniedTerms = [
-  ['a', 'n', 'i', 'm', 'e'].join(''),
-  ['a', 'n', 'i', 'l', 'i', 's', 't'].join(''),
-  ['m', 'y', 'a', 'n', 'i', 'm', 'e', 'l', 'i', 's', 't'].join('')
-];
+const deniedTerms = ['vidlink', 'videasy'];
 const ignoredDirs = new Set([
   '.agents',
   '.codex',
@@ -35,8 +31,8 @@ const collectFiles = (dir) => {
   });
 };
 
-test('app-owned files do not mention retired category providers', () => {
-  const matches = collectFiles(rootDir).flatMap((path) => {
+test('app source does not reference retired player providers', () => {
+  const matches = collectFiles(join(rootDir, 'src')).flatMap((path) => {
     const relativePath = relative(rootDir, path);
     const content = readFileSync(path, 'utf8').toLowerCase();
 

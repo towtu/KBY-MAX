@@ -2,10 +2,13 @@ import {
   fetchDiscoverMovies,
   fetchKDramas,
   fetchPopular,
+  fetchPopularAnime,
   fetchTopRated,
   fetchTrending,
+  fetchTrendingAnime,
   fetchTrendingMovies,
   fetchTrendingTV,
+  searchAnime,
   searchMovies
 } from './api.js';
 import { MOVIE_CATEGORY_ROWS } from './homeRows.js';
@@ -122,6 +125,8 @@ export const fetchSearchCatalog = async () => {
     fetchTrendingTV(),
     fetchKDramas(),
     fetchTopRated(),
+    fetchTrendingAnime(),
+    fetchPopularAnime(),
     ...MOVIE_CATEGORY_ROWS.map((row) => fetchDiscoverMovies({
       withGenres: row.withGenres,
       sortBy: row.sortBy
@@ -131,32 +136,36 @@ export const fetchSearchCatalog = async () => {
   return catalogPromise;
 };
 
-export const searchMoviesWithFallback = async (query) => {
+export const searchMoviesWithFallback = async (query, {
+  searchMovieFetcher = searchMovies,
+  searchAnimeFetcher = searchAnime,
+  catalogFetcher = fetchSearchCatalog
+} = {}) => {
   if (!query?.trim()) return { results: [], usedFallback: false };
 
-  const [movieSearch] = await Promise.allSettled([
-    searchMovies(query)
+  const [movieSearch, animeSearch] = await Promise.allSettled([
+    searchMovieFetcher(query),
+    searchAnimeFetcher(query)
   ]);
   const remoteData = movieSearch.status === 'fulfilled'
     ? movieSearch.value
     : { results: [] };
   const remoteResults = dedupeResults([
-    ...(movieSearch.status === 'fulfilled' ? movieSearch.value.results || [] : [])
+    ...(movieSearch.status === 'fulfilled' ? movieSearch.value.results || [] : []),
+    ...(animeSearch.status === 'fulfilled' ? animeSearch.value.results || [] : [])
   ]);
 
   if (remoteResults.length >= 6) {
     return { ...remoteData, results: remoteResults, usedFallback: false };
   }
 
-  const catalog = await fetchSearchCatalog();
+  const catalog = await catalogFetcher();
   const fuzzyResults = findFuzzyMatches(query, catalog, { limit: 18 });
-  const results = fuzzyResults.length > 0
-    ? fuzzyResults
-    : remoteResults.slice(0, 18);
+  const results = dedupeResults([...remoteResults, ...fuzzyResults]).slice(0, 18);
 
   return {
     ...remoteData,
     results,
-    usedFallback: fuzzyResults.length > 0
+    usedFallback: results.length > remoteResults.length
   };
 };

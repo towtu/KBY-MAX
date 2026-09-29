@@ -161,3 +161,231 @@ export const fetchTVDetails = async (id) => {
 export const fetchSeasonDetails = async (id, season, requestOptions) => {
   return fetchJson(`${BASE_URL}/tv/${id}/season/${season}?language=en-US`, requestOptions);
 };
+
+// ── AniList GraphQL API (Anime) ──────────────────────────────────────────────
+
+const ANILIST_API_URL = 'https://graphql.anilist.co';
+
+const fetchAniList = async (query, variables = {}, {
+  fetcher = fetch,
+  timeoutMs = API_TIMEOUT_MS
+} = {}) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetcher(ANILIST_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal
+    });
+
+    if (!res.ok) {
+      throw new Error(`AniList API request failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (data.errors?.length) {
+      throw new Error(data.errors.map((error) => error.message).join('; '));
+    }
+    return data;
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error('AniList API request timed out', { cause: error });
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+};
+
+const mapAniListMedia = (media) => {
+  if (!media) return null;
+
+  const title = media.title?.english || media.title?.romaji || media.title?.native || 'Untitled';
+  const startDate = media.startDate;
+  const firstAirDate = startDate?.year
+    ? `${startDate.year}-${String(startDate.month || 1).padStart(2, '0')}-${String(startDate.day || 1).padStart(2, '0')}`
+    : '';
+
+  return {
+    id: media.id,
+    title,
+    name: title,
+    poster_path: media.coverImage?.extraLarge || media.coverImage?.large || '',
+    backdrop_path: media.bannerImage || '',
+    vote_average: media.averageScore ? media.averageScore / 10 : null,
+    overview: stripHtmlTags(media.description),
+    media_type: 'anime',
+    first_air_date: firstAirDate,
+    genre_ids: [],
+    genres: (media.genres || []).map((g) => ({ id: g, name: g })),
+    popularity: media.popularity || 0,
+    episodes: media.episodes || 0,
+    format: media.format || ''
+  };
+};
+
+const ANILIST_MEDIA_FIELDS = `
+  id
+  title { romaji english native }
+  coverImage { extraLarge large }
+  bannerImage
+  description(asHtml: false)
+  genres
+  averageScore
+  popularity
+  episodes
+  status
+  startDate { year month day }
+  format
+`;
+
+export const fetchTrendingAnime = async (requestOptions) => {
+  const query = `
+    query ($page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(sort: TRENDING_DESC, type: ANIME, isAdult: false) {
+          ${ANILIST_MEDIA_FIELDS}
+        }
+      }
+    }
+  `;
+
+  const data = await fetchAniList(query, { page: 1, perPage: 20 }, requestOptions);
+  const results = (data?.data?.Page?.media || []).map(mapAniListMedia).filter(Boolean);
+  return { results };
+};
+
+export const fetchPopularAnime = async (requestOptions) => {
+  const query = `
+    query ($page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(sort: POPULARITY_DESC, type: ANIME, isAdult: false) {
+          ${ANILIST_MEDIA_FIELDS}
+        }
+      }
+    }
+  `;
+
+  const data = await fetchAniList(query, { page: 1, perPage: 20 }, requestOptions);
+  const results = (data?.data?.Page?.media || []).map(mapAniListMedia).filter(Boolean);
+  return { results };
+};
+
+export const searchAnime = async (query, requestOptions) => {
+  if (!query) return { results: [] };
+
+  const gqlQuery = `
+    query ($search: String, $page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(search: $search, type: ANIME, isAdult: false, sort: SEARCH_MATCH) {
+          ${ANILIST_MEDIA_FIELDS}
+        }
+      }
+    }
+  `;
+
+  const data = await fetchAniList(gqlQuery, { search: query, page: 1, perPage: 10 }, requestOptions);
+  const results = (data?.data?.Page?.media || []).map(mapAniListMedia).filter(Boolean);
+  return { results };
+};
+
+export const fetchAnimeDetails = async (id, requestOptions) => {
+  const query = `
+    query ($id: Int) {
+      Media(id: $id, type: ANIME) {
+        id
+        title { romaji english native }
+        coverImage { extraLarge large }
+        bannerImage
+        description(asHtml: false)
+        genres
+        averageScore
+        popularity
+        episodes
+        status
+        season
+        seasonYear
+        format
+        duration
+        startDate { year month day }
+        endDate { year month day }
+        studios(isMain: true) {
+          nodes { name }
+        }
+        characters(sort: ROLE, page: 1, perPage: 8) {
+          nodes {
+            name { full }
+            image { large }
+          }
+        }
+        recommendations(page: 1, perPage: 12) {
+          nodes {
+            mediaRecommendation {
+              id
+              type
+              title { romaji english }
+              coverImage { extraLarge large }
+              bannerImage
+              averageScore
+              genres
+              popularity
+              episodes
+              format
+              startDate { year month day }
+            }
+          }
+        }
+        relations {
+          nodes {
+            id
+            title { romaji english }
+            coverImage { extraLarge large }
+            bannerImage
+            averageScore
+            genres
+            type
+            format
+            startDate { year month day }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await fetchAniList(query, { id: Number(id) }, requestOptions);
+  const media = data?.data?.Media;
+  if (!media) throw new Error(`Anime not found: ${id}`);
+
+  const mapped = mapAniListMedia(media);
+
+  return {
+    ...mapped,
+    episode_count: media.episodes || 0,
+    status: media.status,
+    duration: media.duration,
+    season: media.season,
+    seasonYear: media.seasonYear,
+    studios: (media.studios?.nodes || []).map((s) => ({ name: s.name })),
+    characters: (media.characters?.nodes || []).map((c) => ({
+      name: c.name,
+      image: c.image
+    })),
+    recommendations: (media.recommendations?.nodes || [])
+      .filter((n) => n.mediaRecommendation?.type === 'ANIME')
+      .map((n) => mapAniListMedia(n.mediaRecommendation))
+      .filter(Boolean),
+    relations: (media.relations?.nodes || [])
+      .filter((n) => n.type === 'ANIME')
+      .map(mapAniListMedia)
+      .filter(Boolean)
+  };
+};

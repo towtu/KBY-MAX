@@ -111,6 +111,28 @@ export const BROWSE_ROW_CONFIGS = [
     withGenres: '35',
     sortBy: 'popularity.desc'
   },
+  {
+    id: 'anime',
+    title: 'Anime',
+    note: 'Anime collection',
+    source: 'animeHub',
+    quickLinks: [
+      { id: 'trending-anime', label: 'Trending' },
+      { id: 'popular-anime', label: 'Popular' }
+    ]
+  },
+  {
+    id: 'trending-anime',
+    title: 'Trending Anime',
+    note: 'Hot anime right now',
+    source: 'trendingAnime'
+  },
+  {
+    id: 'popular-anime',
+    title: 'Popular Anime',
+    note: 'Most popular anime',
+    source: 'popularAnime'
+  },
   ...MOVIE_CATEGORY_ROWS.map((row) => ({
     ...row,
     note: 'Curated by genre',
@@ -143,6 +165,7 @@ export const buildHomeRows = ({
   trendingMovies = [],
   trendingShows = [],
   kDramas = [],
+  trendingAnime = [],
   topRated = [],
   categoryRows = []
 } = {}) => {
@@ -185,6 +208,12 @@ export const buildHomeRows = ({
       title: 'Binge-Worthy K-Dramas',
       items: kDramas,
       note: 'Korean series picks'
+    }),
+    createRow({
+      id: 'trending-anime',
+      title: 'Trending Anime',
+      items: trendingAnime,
+      note: 'Hot anime right now'
     }),
     ...categoryRows.map((row) => createRow(row)),
     createRow({

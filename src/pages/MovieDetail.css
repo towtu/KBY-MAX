@@ -201,72 +201,6 @@
   margin-bottom: 1rem;
 }
 
-.player-server-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.45rem;
-}
-
-.player-server-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem;
-  border-radius: 999px;
-  background: #070a0f;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.player-server {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.38rem;
-  min-height: 40px;
-  padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  color: #cbd5e1;
-  background: transparent;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font: inherit;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
-}
-
-.player-server span {
-  font-size: 0.74rem;
-  font-weight: 950;
-  text-transform: uppercase;
-}
-
-.player-server strong {
-  color: inherit;
-  font-size: 0.8rem;
-  font-weight: 850;
-}
-
-.player-server:hover,
-.player-server:focus-visible {
-  color: #fff;
-  background: #111720;
-  border-color: rgba(255, 255, 255, 0.18);
-  outline: none;
-}
-
-.player-server.active {
-  color: #05070a;
-  background: #f8fafc;
-  border-color: #f8fafc;
-  transform: translateY(-1px);
-}
-
-.player-server-hint {
-  margin: 0;
-  color: #8f9aaa;
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
 .episode-panel {
   margin-bottom: 1rem;
   padding: 0.85rem;
@@ -684,21 +618,6 @@
 
   .player-heading {
     display: block;
-  }
-
-  .player-server-controls {
-    align-items: stretch;
-    margin-top: 0.75rem;
-  }
-
-  .player-server-group {
-    flex-wrap: wrap;
-    border-radius: 8px;
-  }
-
-  .player-server {
-    flex: 1 1 140px;
-    justify-content: center;
   }
 
   .movie-player-section {

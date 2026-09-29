@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { findFuzzyMatches, normalizeSearchText } from '../src/searchCatalog.js';
+import { findFuzzyMatches, normalizeSearchText, searchMoviesWithFallback } from '../src/searchCatalog.js';
 
 const catalog = [
   { id: 1, media_type: 'movie', title: 'Spider-Man: Into the Spider-Verse', popularity: 90 },
@@ -32,4 +32,26 @@ test('findFuzzyMatches ignores tiny title tokens from punctuation', () => {
   ]);
 
   assert.deepEqual(matches.map((item) => item.id), [1]);
+});
+
+test('search combines movies and anime even when catalog IDs match', async () => {
+  const result = await searchMoviesWithFallback('Cowboy', {
+    searchMovieFetcher: async () => ({ results: [{ id: 1, media_type: 'movie', title: 'Cowboy' }] }),
+    searchAnimeFetcher: async () => ({ results: [{ id: 1, media_type: 'anime', title: 'Cowboy Bebop' }] }),
+    catalogFetcher: async () => []
+  });
+
+  assert.deepEqual(result.results.map((item) => item.media_type), ['movie', 'anime']);
+  assert.equal(result.usedFallback, false);
+});
+
+test('anime search survives a movie API failure and keeps close catalog matches', async () => {
+  const result = await searchMoviesWithFallback('bebp', {
+    searchMovieFetcher: async () => { throw new Error('TMDB unavailable'); },
+    searchAnimeFetcher: async () => ({ results: [] }),
+    catalogFetcher: async () => [{ id: 1, media_type: 'anime', title: 'Cowboy Bebop' }]
+  });
+
+  assert.equal(result.results[0]?.media_type, 'anime');
+  assert.equal(result.usedFallback, true);
 });

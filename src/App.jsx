@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Browse from './pages/Browse';
 import MovieDetail from './pages/MovieDetail';
+import AnimeDetail from './pages/AnimeDetail';
 import Search from './pages/Search';
 import './App.css';
 
@@ -16,6 +17,7 @@ function App() {
           <Route path="/browse/:rowId" element={<Browse />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/tv/:id" element={<MovieDetail isTV={true} />} />
+          <Route path="/anime/:id" element={<AnimeDetail />} />
           <Route path="/search" element={<Search />} />
           {/* Add a fallback route */}
           <Route path="*" element={<Home />} />

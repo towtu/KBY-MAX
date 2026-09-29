@@ -1,6 +1,6 @@
 export const RESUME_STORAGE_KEY = 'kby_max_resume_items';
 const MAX_RESUME_ITEMS = 12;
-const ALLOWED_RESUME_MEDIA_TYPES = ['movie', 'tv'];
+const ALLOWED_RESUME_MEDIA_TYPES = ['movie', 'tv', 'anime'];
 
 const getStorage = () => {
   if (typeof window === 'undefined') return null;

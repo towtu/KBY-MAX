@@ -6,7 +6,9 @@ import {
   fetchDiscoverTV,
   fetchKDramas,
   fetchPopular,
+  fetchPopularAnime,
   fetchTopRated,
+  fetchTrendingAnime,
   fetchTrendingMovies,
   fetchTrendingTV
 } from '../api';
@@ -69,6 +71,23 @@ const fetchBrowseItems = async (config) => {
       drama.results || [],
       comedy.results || []
     ]).slice(0, 72);
+  }
+
+  if (config.source === 'animeHub') {
+    const results = await Promise.allSettled([fetchTrendingAnime(), fetchPopularAnime()]);
+    return mergeUniqueMediaItems(results.flatMap((result) => (
+      result.status === 'fulfilled' ? result.value.results || [] : []
+    ))).slice(0, 72);
+  }
+
+  if (config.source === 'trendingAnime') {
+    const data = await fetchTrendingAnime();
+    return data.results || [];
+  }
+
+  if (config.source === 'popularAnime') {
+    const data = await fetchPopularAnime();
+    return data.results || [];
   }
 
   if (config.source === 'popular') {

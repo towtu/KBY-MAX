@@ -50,7 +50,7 @@ export default function Search() {
       ) : results.length > 0 ? (
         <div className="movie-grid animate-fade-in">
           {results.map(movie => (
-            <MovieCard key={movie.id} movie={movie} />
+            <MovieCard key={`${movie.media_type || 'movie'}-${movie.id}`} movie={movie} />
           ))}
         </div>
       ) : (

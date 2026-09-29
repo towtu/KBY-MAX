@@ -7,6 +7,7 @@ import {
   fetchPopular,
   fetchTopRated,
   fetchTrending,
+  fetchTrendingAnime,
   fetchTrendingMovies,
   fetchTrendingTV,
   getImageUrl
@@ -23,6 +24,7 @@ const EMPTY_HOME_DATA = {
   trendingMovies: [],
   trendingShows: [],
   kDramas: [],
+  trendingAnime: [],
   topRated: [],
   categoryRows: []
 };
@@ -108,6 +110,7 @@ export default function Home() {
         trendingShowsSettled,
         kDramasSettled,
         topRatedSettled,
+        trendingAnimeSettled,
         categoryRowsSettled
       ] = await Promise.allSettled([
         fetchTrending(),
@@ -116,6 +119,7 @@ export default function Home() {
         fetchTrendingTV(),
         fetchKDramas(),
         fetchTopRated(),
+        fetchTrendingAnime(),
         Promise.allSettled(categoryRequests)
       ]);
 
@@ -126,6 +130,7 @@ export default function Home() {
         trendingShows: getSettledResults(trendingShowsSettled),
         kDramas: getSettledResults(kDramasSettled),
         topRated: getSettledResults(topRatedSettled),
+        trendingAnime: getSettledResults(trendingAnimeSettled),
         categoryRows: categoryRowsSettled.status === 'fulfilled'
           ? categoryRowsSettled.value
             .filter((result) => result.status === 'fulfilled')
@@ -167,6 +172,7 @@ export default function Home() {
       trendingMovies: homeData.trendingMovies.slice(0, 18),
       trendingShows: homeData.trendingShows.slice(0, 18),
       kDramas: homeData.kDramas.slice(0, 18),
+      trendingAnime: homeData.trendingAnime.slice(0, 18),
       topRated: homeData.topRated.slice(0, 18),
       categoryRows: homeData.categoryRows.map((row) => ({
         ...row,
